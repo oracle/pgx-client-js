@@ -59,13 +59,22 @@ p.then(function (session) {
 });
 ```
 
-## Compatibility
+## Known issues
 
-The PGX JS client is compatible with PGX 2.7.0.
-The PGX JS client is not compatible with PGX 3.0.0 or later due to changes in the REST API.
+### Compatibility
+
+The PGX JS client is compatible with PGX 2.7.0, but not with PGX 3.0.0 or later due to changes in the REST API.
 We invite contributions that make the PGX JS client compatible with newer versions of PGX.
 The REST API used by PGX 3.2.0 is documented in [swagger.json](https://docs.oracle.com/cd/E56133_01/latest/swagger/swagger.json).
 The easiest way to browse this documentation is by loading swagger.json into the [Swagger Editor](https://editor.swagger.io).
+
+### Big numbers
+
+JavaScript numbers are all floating point, stored according to the IEEE 754 standard.
+The PGX server might return numbers that fall out of IEEE 754 integer precision range.
+For example, the JSON may contain the number `9223372036854775807`, but the result of `JSON.parse` is `9223372036854776000`.
+The [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) type provides a way to represent larger numbers.
+We invite contributions that make the PGX JS client support large numbers.
 
 ## References
 
