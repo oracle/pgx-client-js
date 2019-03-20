@@ -1,0 +1,26 @@
+{
+  "name": "pgx-client-js",
+  "version": "1.0.0",
+  "description": "A JavaScript client for the PGX server.",
+  "main": "pgx.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "cookie": "0.2.3",
+    "request": "2.83.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "pgx",
+    "parallel",
+    "graph",
+    "analytics",
+    "query"
+  ],
+  "author": "Oracle",
+  "license": "UPL-1.0"
+}

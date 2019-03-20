@@ -3,7 +3,7 @@
 Use the PGX JavaScript client to communicate with the PGX server from your JavaScript application.
 More information about PGX (including documentation) can be found on the [Oracle Technology Network (OTN)](https://www.oracle.com/technetwork/oracle-labs/parallel-graph-analytix/overview/index.html) website.
 
-## Installation
+## Prerequisites
 
 The PGX client needs a PGX server that it can connect to.
 
@@ -16,16 +16,16 @@ You can open [http://localhost:7007/version](http://localhost:7007/version) to v
 
 ## Usage
 
-The JS module requires two third-party modules that need to be installed:
+Add `pgx-client-js` as a dependency of your project:
 
 ```
-npm i request cookie
+npm i oracle/pgx-client-js
 ```
 
 Require the PGX JS client module in your project:
 
 ```
-const pgx = require('./path/to/pgx.js');
+const pgx = require('pgx-client-js');
 ```
 
 Connect to the PGX server:
