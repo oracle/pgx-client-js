@@ -59,7 +59,8 @@ module.exports.doPost = function (url, session, jsonContent) {
       let options = Object.assign(session.basePostRequest, { url: url, json: localJson });
       request(options, function(err, response, body) {
         let statusCode = response != null ? response.statusCode : null;
-        if (!err && ((statusCode === HTTP_STATUS_CODES.OK) || (statusCode === HTTP_STATUS_CODES.CREATED))) {
+        if (!err && ((statusCode === HTTP_STATUS_CODES.OK) || (statusCode === HTTP_STATUS_CODES.CREATED)
+            || (statusCode === HTTP_STATUS_CODES.ACCEPTED))) {
           future.getFuture(session, body.futureId).then(function(result) {
             resolve(result);
           }, function(err) {
@@ -78,7 +79,8 @@ module.exports.doGet = function (url, session, withFuture) {
       let options = Object.assign(session.baseGetRequest, { url: url });
       request(options, function(err, response, body) {
         let statusCode = response != null ? response.statusCode : null;
-        if (!err && ((statusCode === HTTP_STATUS_CODES.OK) || (statusCode === HTTP_STATUS_CODES.CREATED))) {
+        if (!err && ((statusCode === HTTP_STATUS_CODES.OK) || (statusCode === HTTP_STATUS_CODES.CREATED)
+            || (statusCode === HTTP_STATUS_CODES.ACCEPTED))) {
           if (withFuture) {
             future.getFuture(session, JSON.parse(body).futureId).then(function(result) {
               resolve(result);

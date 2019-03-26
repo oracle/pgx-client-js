@@ -416,13 +416,14 @@ module.exports = class Graph {
   queryPgql(query) {
     let self = this;
     let queryJson = {
-      'pgqlQuery': query
+      'pgqlQuery': query,
+      'graphName': self.name
     };
     return core.queryPgql(self, queryJson).then(function(result) {
       return resultSetService.getResultSetElements(self, result.resultSetId).then(function(elements) {
         let collection = [];
-        for(var i=0; i<elements.length; i++) {
-          collection.push(new resultElement(elements[i].elementType, elements[i].varName, elements[i].vertexEdgeIdType));
+        for(var i=0; i<elements.items.length; i++) {
+          collection.push(new resultElement(elements.items[i].elementType, elements.items[i].varName, elements.items[i].vertexEdgeIdType));
         }
         return new resultSet(result, collection, self);
       });

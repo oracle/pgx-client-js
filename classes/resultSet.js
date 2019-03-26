@@ -59,7 +59,7 @@ module.exports = class ResultSet {
         return elements;
       };
 
-      return result.map(callback);
+      return result.items.map(callback);
     });
   }
 

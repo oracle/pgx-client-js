@@ -246,7 +246,7 @@ module.exports.postPublishProperty = function (property) {
 }
 
 module.exports.readGraphWithProperties = function (session, jsonContent) {
-  let url = session.baseUrl + '/core/graph';
+  let url = session.baseUrl + '/core/v1/loadGraph';
   if (typeof jsonContent === 'string' || jsonContent instanceof String) {
     jsonContent = JSON.parse(jsonContent);
   }
@@ -263,7 +263,7 @@ module.exports.getEdgeLabel = function (graph, edgeKey, keyType) {
 }
 
 module.exports.queryPgql = function (graph, queryJson) {
-  let url = graph.session.baseUrl + '/core/graph/' + encodeURIComponent(graph.name) + '/query';
+  let url = graph.session.baseUrl + '/core/v1/pgql/run';
   return common.doPost(url, graph.session, queryJson);
 }
 
@@ -337,7 +337,7 @@ module.exports.getRandomNode = function (graph) {
 }
 
 module.exports.getGraph = function (session, name) {
-  let url = session.baseUrl + '/core/graph/' + encodeURIComponent(name) + '?ignoreNotFound=true';
+  let url = session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(name) + '?ignoreNotFound=true';
   return common.doGet(url, session, true);
 }
 

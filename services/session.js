@@ -17,7 +17,7 @@ const common = require('../services/common.js');
 
 module.exports.postSession = function (url, options, tokenId) {
   let localOptions = Object.assign({}, options);
-  localOptions.url = url + '/session';
+  localOptions.url = url + '/core/v1/sessions';
   if (typeof window === 'undefined') { // no need to do this in a browser (will trigger security error)
     localOptions.headers = {
       'Cookie': '_csrf_token=' + tokenId
@@ -48,6 +48,6 @@ module.exports.postSession = function (url, options, tokenId) {
 }
 
 module.exports.delSession = function (session) {
-  let url = session.baseUrl + '/session' + '?_csrf_token=' + session.tokenId;
+  let url = session.baseUrl + '/core/v1/session?_csrf_token=' + session.tokenId;
   return common.doDel(url, session, session);
 }

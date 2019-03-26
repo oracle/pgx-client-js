@@ -64,10 +64,23 @@ p.then(function (session) {
 
 ### Compatibility
 
-The PGX JS client is compatible with PGX 2.7.0, but not with PGX 3.0.0 or later due to changes in the REST API.
+The PGX JS client is compatible with PGX 2.7.0.
+Because PGX 3.0.0 made big changes in the REST API, many methods are no longer compatible.
+A small number of methods (listed below) have been updated to work with PGX 19.1.
 We invite contributions that make the PGX JS client compatible with newer versions of PGX.
 The REST API used by PGX 3.2.0 is documented in [swagger.json](https://docs.oracle.com/cd/E56133_01/latest/swagger/swagger.json).
 The easiest way to browse this documentation is by loading swagger.json into the [Swagger Editor](https://editor.swagger.io).
+
+The following methods have been updated to work with PGX 19.1:
+
+- `session.readGraphWithProperties`
+- `session.getGraph`
+- `graph.queryPgql`
+- `resultSet.getResults`
+- `resultSet.getResultSetElements`
+- `resultSet.getResultSet`
+- `session.postSession`
+- `session.delSession`
 
 ### Big numbers
 
