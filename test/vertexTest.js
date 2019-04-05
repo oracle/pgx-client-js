@@ -6,21 +6,21 @@
  */
 'use strict'
 
-const pgx = require('../../main/javascript/pgx.js');
+const pgx = require('../pgx.js');
 const url = "https://localhost:7007"
 
 var path = require('path');
 var fs = require('fs');
 
-const clientKey = fs.readFileSync(path.resolve(__dirname, "../../../../client/build/keys/client_key.pem"));
-const clientCert = fs.readFileSync(path.resolve(__dirname, "../../../../client/build/keys/client_certificate.pem"));
-const caCert = fs.readFileSync(path.resolve(__dirname, "../../../../client/build/keys/ca_certificate.pem"));
+// const clientKey = fs.readFileSync(path.resolve(__dirname, "../../../../client/build/keys/client_key.pem"));
+// const clientCert = fs.readFileSync(path.resolve(__dirname, "../../../../client/build/keys/client_certificate.pem"));
+// const caCert = fs.readFileSync(path.resolve(__dirname, "../../../../client/build/keys/ca_certificate.pem"));
 
 let options = {
-  clientKey: clientKey,
-  clientCert: clientCert,
-  caCert: caCert,
-  passphrase: 'sysadm',
+  // clientKey: clientKey,
+  // clientCert: clientCert,
+  // caCert: caCert,
+  // passphrase: 'sysadm',
   prefetchSize: 2048,
   uploadBatchSize: 65536,
   remoteFutureTimeout: 300000,

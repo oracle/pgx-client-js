@@ -6,7 +6,7 @@
  */
 'use strict'
 
-const pgx = require('../../main/javascript/pgx.js');
+const pgx = require('../pgx.js');
 
 let vf = pgx.createVertexFilter('true');
 console.log('binaryOperation: ' + vf.binaryOperation);

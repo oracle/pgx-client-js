@@ -6,7 +6,7 @@
  */
 'use strict'
 
-const pgx = require('../../main/javascript/pgx.js');
+const pgx = require('../pgx.js');
 const url = "http://localhost:8080/pgx"
 
 var path = require('path');

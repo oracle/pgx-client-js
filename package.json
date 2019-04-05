@@ -10,9 +10,11 @@
     "cookie": "0.2.3",
     "request": "2.83.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^6.0.2"
+  },
   "scripts": {
-    "test": "test"
+    "test": "mocha"
   },
   "keywords": [
     "pgx",
