@@ -1,7 +1,7 @@
-# PGX JavaScript client
+# PGX JavaScript Client
 
 Use the PGX JavaScript client to communicate with the PGX server from your JavaScript application.
-More information about PGX (including documentation) can be found on the [Oracle Technology Network (OTN)](https://www.oracle.com/technetwork/oracle-labs/parallel-graph-analytix/overview/index.html) website.
+More information about PGX can be found on the [Oracle Technology Network (OTN)](https://www.oracle.com/technetwork/oracle-labs/parallel-graph-analytix/overview/index.html) page and the [PGX documentation](https://docs.oracle.com/cd/E56133_01/latest/) website.
 
 ## Prerequisites
 
@@ -13,6 +13,7 @@ The PGX client needs a PGX server that it can connect to.
 4. Run `./bin/start-server`.
 
 You can open [http://localhost:7007/version](http://localhost:7007/version) to verify the PGX server is up and running.
+Once the PGX server is up and running you can use this library to connect to the server from JavaScript.
 
 ## Usage
 
@@ -24,19 +25,19 @@ npm i oracle/pgx-client-js
 
 Require the PGX JS client module in your project:
 
-```
+```js
 const pgx = require('pgx-client-js');
 ```
 
 Connect to the PGX server:
 
-```
+```js
 let p = pgx.connect('http://localhost:7007');
 ```
 
 Load a graph and print the number of vertices and edges:
 
-```
+```js
 p.then(function (session) {
   return session.readGraphWithProperties({
     uri: 'examples/graphs/sample.adj',
@@ -45,7 +46,7 @@ p.then(function (session) {
       name: 'prop1',
       type: 'int'
     }],
-    'edge_props': [{
+    edge_props: [{
       name: 'cost',
       type: 'double'
     }],
@@ -76,8 +77,9 @@ For example, the JSON may contain the number `9223372036854775807`, but the resu
 The [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) type provides a way to represent larger numbers.
 We invite contributions that make the PGX JS client support large numbers.
 
-## References
+## Resources
 
-* [Documentation for PGX 2.7.0](https://docs.oracle.com/cd/E56133_01/2.7.0/index.html)
-* [Documentation on latest PGX](https://docs.oracle.com/cd/E56133_01/latest/index.html)
-
+* [PGX on Oracle Technology Network](https://www.oracle.com/technetwork/oracle-labs/parallel-graph-analytix/overview/index.html)
+* [Documentation PGX 2.7.0](https://docs.oracle.com/cd/E56133_01/2.7.0/index.html)
+* [Documentation PGX (latest)](https://docs.oracle.com/cd/E56133_01/latest/index.html)
+* [PGX Sample code](https://github.com/oracle/pgx-samples)
