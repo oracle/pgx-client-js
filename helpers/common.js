@@ -19,8 +19,20 @@ module.exports.getOptions = function(defaultOptions, options) {
   return result;
 }
 
+let parseResult = function (result) {
+  if (!result) {
+    return null;
+  }
+
+  if (typeof result == 'string') {
+    return JSON.parse(result);
+  } else {
+    return result;
+  }
+}
+
 module.exports.createError = function(error, statusCode, result) {
-  let localResult = result ? JSON.parse(result) : null;
+  let localResult = parseResult(result);
   let obj = { err: error, statusCode: statusCode, result: localResult };
   return new Error(JSON.stringify(obj));
 }

@@ -7,7 +7,7 @@
 'use strict'
 
 const pgx = require('../pgx.js');
-const url = "https://localhost:7007"
+const url = "http://localhost:7007"
 
 var path = require('path');
 var fs = require('fs');
@@ -29,7 +29,7 @@ let options = {
 let p = pgx.connect(url, options);
 
 let jsonContent = `{
-                    "uri": "http://slc09iyv.us.oracle.com:8000/sample.adj",
+                    "uri": "examples/graphs/sample.adj",
                     "format": "adj_list",
                     "vertex_props": [{
                       "name": "prop1",

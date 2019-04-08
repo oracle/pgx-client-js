@@ -406,7 +406,7 @@ module.exports.closenessCentrality = function (graph, options) {
   let localProperty;
   return getDefaultProperty(graph, propertyJson, finalOptions.cc).then(function(property) {
     localProperty = property;
-     let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'boolean')
+     let analysisJson = new argumentBuilderClass('CPU_BOUND', 'boolean')
        .addGraphArg(graph.name)
        .addNodePropertyArg(localProperty.name).build();
      if (finalOptions.variant === closenessCentralityVariant.WEIGHTED) {
@@ -430,7 +430,7 @@ module.exports.degreeCentrality = function (graph, options) {
   let localProperty;
   return getDefaultProperty(graph, propertyJson, finalOptions.dc).then(function(property) {
     localProperty = property;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addNodePropertyArg(localProperty.name).build();
     return coreService.postAnalysis(graph, analysisJson, algorithms[finalOptions.direction]);
@@ -449,7 +449,7 @@ module.exports.degreeDistribution = function (graph, options) {
   let distribution;
   return getDefaultMap(graph, mapJson, finalOptions.distribution).then(function(map) {
     distribution = map;
-    let analysisJson = new argumentBuilderClass('FAST_TRACK_ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addMapArg(distribution.name).build();
     return coreService.postAnalysis(graph, analysisJson, algorithms[finalOptions.degree]);
@@ -459,11 +459,17 @@ module.exports.degreeDistribution = function (graph, options) {
 }
 
 module.exports.shortestPathDijkstra = function (graph, options) {
+  console.log("options = ");
+  console.log(options);
   let finalOptions = common.getOptions(dijkstraDefault, options);
   let type = finalOptions.variant;
   let rootId = finalOptions.src instanceof vertexClass ? finalOptions.src.id : finalOptions.src;
   let destId = finalOptions.dst instanceof vertexClass ? finalOptions.dst.id : finalOptions.dst;
   let costName = finalOptions.cost instanceof propertyClass ? finalOptions.cost.name : finalOptions.cost;
+  console.log("costName = ");
+  console.log(costName);
+  console.log("finalOptions = ");
+  console.log(finalOptions);
   let parentJson = {
     'entityType': 'vertex',
     'type': 'vertex',
@@ -485,7 +491,7 @@ module.exports.shortestPathDijkstra = function (graph, options) {
     return getDefaultProperty(graph, parentEdgeJson, finalOptions.parentEdge);
   }).then(function(property) {
     parentEdge = property;
-    let analysisJson = new argumentBuilderClass('FAST_TRACK_ANALYSIS_POOL', 'boolean')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'boolean')
       .addGraphArg(graph.name)
       .addEdgePropertyArg(costName)
       .addNodeIdInArg(rootId)
@@ -531,7 +537,7 @@ module.exports.eigenvectorCentrality = function (graph, options) {
   let localProperty;
   return getDefaultProperty(graph, propertyJson, finalOptions.ec).then(function(property) {
     localProperty = property;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addIntInArg(finalOptions.max)
       .addDoubleInArg(finalOptions.maxDiff)
@@ -580,7 +586,7 @@ module.exports.fattestPath = function (graph, options) {
     return getDefaultProperty(graph, parentEdgeJson, finalOptions.parentEdge);
   }).then(function(property) {
     parentEdge = property;
-    let analysisJson = new argumentBuilderClass('FAST_TRACK_ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addEdgePropertyArg(capName)
       .addNodeIdInArg(rootId)
@@ -641,7 +647,7 @@ module.exports.filteredBfs = function (graph, options) {
     return getDefaultProperty(graph, parentJson, finalOptions.parent);
   }).then(function(property) {
     parent = property;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addNodeIdInArg(rootId)
       .addBoolInArg(finalOptions.initWithInfinity)
@@ -678,7 +684,7 @@ module.exports.hits = function (graph, options) {
     return getDefaultProperty(graph, hubsJson, finalOptions.hubs);
   }).then(function(property) {
     hubs = property;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(hubs.graph.name)
       .addIntInArg(finalOptions.max)
       .addNodePropertyArg(auth.name)
@@ -710,7 +716,7 @@ module.exports.kcore = function (graph, options) {
     return getDefaultScalar(graph, maxKCoreJson, finalOptions.maxKCore);
   }).then(function(scalar) {
     maxKCore = scalar;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'long')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'long')
       .addGraphArg(graph.name)
       .addLongInArg(finalOptions.minCore)
       .addLongInArg(finalOptions.maxCore)
@@ -741,7 +747,7 @@ module.exports.matrixFactorizationGradientDescent = function (graph, options) {
     return getDefaultProperty(graph, featuresJson, finalOptions.features);
   }).then(function(property) {
     featuresProperty = property;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'double')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'double')
       .addGraphArg(graph.name)
       .addNodePropertyArg(leftProperty.name)
       .addEdgePropertyArg(weightPropertyName)
@@ -772,7 +778,7 @@ module.exports.matrixFactorizationRecommendations = function (graph, features, v
     return coreService.postProperty(graph, propertyJson);
   }).then(function(property) {
     rating = new propertyClass(property, graph);
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addNodeIdInArg(vertex.id)
       .addNodePropertyArg(leftProperty.name)
@@ -880,7 +886,7 @@ module.exports.pagerank = function (graph, options) {
   let localProperty;
   return getDefaultProperty(graph, propertyJson, finalOptions.rank).then(function(property) {
     localProperty = property;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addDoubleInArg(finalOptions.e)
       .addDoubleInArg(finalOptions.d)
@@ -955,7 +961,7 @@ module.exports.shortestPath = function (type, graph, options) {
     return getDefaultProperty(graph, parentEdgeJson, finalOptions.parentEdge);
   }).then(function(property) {
     parentEdge = property;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addNodeIdInArg(rootId)
       .addNodePropertyArg(dist.name)
@@ -1000,7 +1006,7 @@ module.exports.countTriangles = function (graph, sortByDegree) {
   let localGraph = {};
   return coreService.postCreateUndirectedGraph(graph, undirectStrategy).then(function(result) {
     localGraph = new graphClass(result, graph.session);
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'long').addGraphArg(result.graphName).build();
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'long').addGraphArg(result.graphName).build();
     // the return is needed twice to wait until the promise finishes.
     if (sortByDegree) {
       return coreService.postSortByDegree(localGraph, sortJson).then(function(result) {
@@ -1060,7 +1066,7 @@ module.exports.vertexBetweennessCentrality = function (graph, options) {
       return localProperty; // needed to be handle in next level
     }
   }).then(function(property) {
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addNodePropertyArg(localProperty.name).build();
     if (type === betweennessCentralityVariant.APPROXIMATE) {
@@ -1089,7 +1095,7 @@ module.exports.adamicAdarCounting = function (graph, options) {
   let localProperty;
   return getDefaultProperty(graph, propertyJson, finalOptions.aa).then(function(property) {
     localProperty = property;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addEdgePropertyArg(localProperty.name).build();
     return coreService.postAnalysis(graph, analysisJson, algorithms.adamicAdarCounting);
@@ -1108,7 +1114,7 @@ function allConductance(graph, options) {
   let localScalar;
   return getDefaultScalar(graph, scalarJson, finalOptions.conductance).then(function(scalar) {
     localScalar = scalar;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'double')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'double')
       .addGraphArg(graph.name)
       .addNodePropertyArg(finalOptions.partition.propertyName)
       .addLongInArg(finalOptions.partitionIndex).build();
@@ -1139,7 +1145,7 @@ function singleConductance(graph, options) {
     return getDefaultScalar(graph, avgJson, finalOptions.conductance);
   }).then(function(scalar) {
     avgCond = scalar;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'double')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'double')
       .addGraphArg(graph.name)
       .addNodePropertyArg(finalOptions.partition.propertyName)
       .addLongInArg(finalOptions.partition.sizeField)
@@ -1171,7 +1177,7 @@ module.exports.partitionModularity = function (graph, options) {
   let localScalar;
   return getDefaultScalar(graph, scalarJson, finalOptions.modularity).then(function(scalar) {
     localScalar = scalar;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'double')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'double')
       .addGraphArg(graph.name)
       .addNodePropertyArg(finalOptions.partition.propertyName)
       .addLongInArg(finalOptions.partition.sizeField).build();
@@ -1206,7 +1212,7 @@ function salsa(graph, options) {
     return getDefaultProperty(graph, rankJson, finalOptions.salsaRank);
   }).then(function(property) {
     rank = property;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addNodePropertyArg(leftProperty.name)
       .addDoubleInArg(finalOptions.maxDiff)
@@ -1251,7 +1257,7 @@ module.exports.whomToFollow = function (graph, options) {
     return getDefaultCollection(graph, authJson, finalOptions.authorities);
     }).then(function(authCollection) {
       authSeq = authCollection;
-      let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+      let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
         .addGraphArg(graph.name)
         .addNodeIdInArg(rootId)
         .addIntInArg(finalOptions.topK)
@@ -1293,7 +1299,7 @@ module.exports.scc = function (graph, options) {
     'hardName': finalOptions.partitionDistributionName === null ? true : false,
     'dimension': 0
   };
-  let targetPool = finalOptions.variant === connectedComponentsVariant.TARJAN ? 'FAST_TRACK_ANALYSIS_POOL' : 'ANALYSIS_POOL';
+  let targetPool = 'CPU_BOUND';
   return getDefaultProperty(graph, propertyJson, finalOptions.partitionDistribution).then(function(property) {
     return vertexSetAlgorithm(algorithms[finalOptions.variant], property, graph, targetPool);
   });
@@ -1309,7 +1315,7 @@ module.exports.wcc = function (graph, options) {
     'dimension': 0
   };
   return getDefaultProperty(graph, propertyJson, finalOptions.partitionDistribution).then(function(property) {
-    return vertexSetAlgorithm(algorithms.weaklyConnectedComponents, property, graph, 'ANALYSIS_POOL');
+    return vertexSetAlgorithm(algorithms.weaklyConnectedComponents, property, graph, 'CPU_BOUND');
   });
 }
 
@@ -1327,13 +1333,13 @@ module.exports.communities = function (graph, options) {
   };
   if (type != communitiesVariant.INFOMAP) {
     return getDefaultProperty(graph, propertyJson, finalOptions.partitonDistribution).then(function(property) {
-      return vertexSetAlgorithm(algorithms[finalOptions.variant], property, graph, 'ANALYSIS_POOL', finalOptions.maxIterations);
+      return vertexSetAlgorithm(algorithms[finalOptions.variant], property, graph, 'CPU_BOUND', finalOptions.maxIterations);
     });
   } else {
     let localProperty;
     return getDefaultProperty(graph, propertyJson, finalOptions.partitonDistribution).then(function(property) {
       localProperty = property;
-      let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'long')
+      let analysisJson = new argumentBuilderClass('CPU_BOUND', 'long')
         .addGraphArg(graph.name)
         .addNodePropertyArg(rankName)
         .addEdgePropertyArg(weightName)
@@ -1351,7 +1357,7 @@ module.exports.communities = function (graph, options) {
 }
 
 module.exports.bipartiteCheck = function (graph, propertyName) {
-  let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'boolean')
+  let analysisJson = new argumentBuilderClass('CPU_BOUND', 'boolean')
     .addGraphArg(graph.name)
     .addNodePropertyArg(propertyName).build();
   return coreService.postAnalysis(graph, analysisJson, algorithms.bipartiteCheck).then(function(result) {
@@ -1380,7 +1386,7 @@ module.exports.diameter = function (graph, options) {
     return getDefaultScalar(graph, diameterJson, finalOptions.diameter);
   }).then(function(scalar) {
     diameter = scalar;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'integer')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'integer')
       .addGraphArg(graph.name)
       .addBoolInArg(finalOptions.diameterOn)
       .addNodePropertyArg(eccentricityProperty.name).build();
@@ -1402,7 +1408,7 @@ module.exports.periphery = function (graph, options) {
   let peripherySet;
   return getDefaultCollection(graph, peripheryJson, finalOptions.periphery).then(function(collection) {
     peripherySet = collection;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addBoolInArg(finalOptions.peripheryOn)
       .addCollectionArg(peripherySet.name).build();
@@ -1424,7 +1430,7 @@ module.exports.localClusteringCoefficient = function (graph, options) {
   let lccProperty;
   return getDefaultProperty(graph, lccJson, finalOptions.lcc).then(function(property) {
     lccProperty = property;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'double')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'double')
       .addGraphArg(graph.name)
       .addNodePropertyArg(lccProperty.name).build();
     return coreService.postAnalysis(graph, analysisJson, algorithms.localClusteringCoefficient);
@@ -1446,7 +1452,7 @@ module.exports.prim = function (graph, options) {
   let localProperty;
   return getDefaultProperty(graph, propertyJson, finalOptions.mst).then(function(property) {
     localProperty = property;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addEdgePropertyArg(weightName)
       .addEdgePropertyArg(localProperty.name).build();
@@ -1480,7 +1486,7 @@ module.exports.findCycle = function (graph, options) {
     return getDefaultCollection(graph, edgeSeqJson, finalOptions.edgeSeq);
   }).then(function(collection) {
     edgeSeq = collection;
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addCollectionArg(nodeSeq.name)
       .addCollectionArg(edgeSeq.name).build();
@@ -1506,7 +1512,7 @@ module.exports.reachability = function (graph, options) {
   let finalOptions = common.getOptions(reachabilityDefault, options);
   let srcId = finalOptions.source instanceof vertexClass ? finalOptions.source.id : finalOptions.source;
   let dstId = finalOptions.dest instanceof vertexClass ? finalOptions.dest.id : finalOptions.dest;
-  let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'integer')
+  let analysisJson = new argumentBuilderClass('CPU_BOUND', 'integer')
     .addGraphArg(graph.name)
     .addNodeIdInArg(srcId)
     .addNodeIdInArg(dstId)
@@ -1530,7 +1536,7 @@ module.exports.topologicalSort = function (graph, options) {
   return getDefaultProperty(graph, topoOrderJson, finalOptions.topoOrder).then(function(property) {
     topoOrderProperty = property;
 
-    let analysisJson = new argumentBuilderClass('ANALYSIS_POOL', 'void')
+    let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
       .addGraphArg(graph.name)
       .addNodePropertyArg(topoOrderProperty.name).build();
 

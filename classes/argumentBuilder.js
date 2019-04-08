@@ -12,8 +12,11 @@ module.exports = class argumentBuilder {
     if (targetPool != null) {
       this.jsonContent = {
         args: [],
-        targetPool: targetPool,
-        expectedReturnType: expectedReturnType
+        expectedReturnType: expectedReturnType,
+        workloadCharacteristics: [
+          "DURATION.LONG_RUNNING",
+          "TARGET_POOL." + targetPool, "PARALLELISM.PARALLEL"
+        ]
       };
     } else {
       this.jsonContent = {};

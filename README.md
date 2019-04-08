@@ -20,7 +20,7 @@ Once the PGX server is up and running you can use this library to connect to the
 Add `pgx-client-js` as a dependency of your project:
 
 ```
-npm i oracle/pgx-client-js
+npm install oracle/pgx-client-js
 ```
 
 Require the PGX JS client module in your project:
@@ -59,6 +59,10 @@ p.then(function (session) {
   console.log("Edges: " + graph.numEdges);
 });
 ```
+
+## Testing
+
+Run `npm test` to run the tests (see `test/`).
 
 ## Known issues
 
