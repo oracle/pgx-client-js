@@ -1,0 +1,65 @@
+'use strict'
+
+const assert = require('assert');
+const common = require('./common.js');
+const pgx = common.pgx;
+
+let p = null;
+let localSession = null;
+
+before(function() {
+  p = pgx.connect(common.baseUrl, common.options).then(function(session) {
+    localSession = session;
+    return session.readGraphWithProperties(common.graphJson);
+  }).then(function(graph) {
+    return graph.createVectorScalar("integer", 10);
+  });
+});
+
+describe('vector scalar', function () {
+  it('should have a name', function() {
+    return p.then(function(scalar) {
+      assert(scalar.name);
+    });
+  });
+  it('type should be integer', function() {
+    return p.then(function(scalar) {
+      assert(scalar.type === 'integer');
+    });
+  });
+  it('dimension should be 10', function() {
+    return p.then(function(scalar) {
+      assert.equal(10, scalar.dimension);
+    });
+  });
+  it('get should have an array of numbers', function() {
+    return p.then(function(scalar) {
+      return scalar.get();
+    }).then(function(result) {
+      assert(Array.isArray(result) && (typeof result[0] === 'number'));
+    });
+  });
+  it('set should be 5', function() {
+    return p.then(function(scalar) {
+      return scalar.set([5,5,5,5,5,5,5,5,5,5]);
+    }).then(function(scalar) {
+      return scalar.get();
+    }).then(function(result) {
+      assert(Array.isArray(result) && (result[0] === 5));
+    });
+  });
+  it('destroy should remove scalar', function() {
+    return p.then(function(scalar) {
+      return scalar.destroy();
+    }).then(function(result) {
+      assert.equal(null, result);
+    });
+  });
+});
+
+after(function() {
+  localSession.destroy().then(function(result) {
+    p = null;
+    localSession = null;
+  });
+});
