@@ -1,15 +1,16 @@
 'use strict'
 
-const pgx = require(process.env.ORACLE_PGX_DIR);
+let oracle_pgx_dir = process.env.ORACLE_PGX_DIR || process.cwd();
+const pgx = require(oracle_pgx_dir);
 const fs = require('fs');
 
-let baseUrl = process.env.BASE_URL;
+let baseUrl = process.env.BASE_URL || "http://localhost:7007";
 
 let options = {
-  clientKey: fs.readFileSync(process.env.CLIENT_KEY),
-  clientCert: fs.readFileSync(process.env.CLIENT_CERT),
-  caCert: fs.readFileSync(process.env.CA_CERT),
-  passphrase: process.env.PASSPHRASE,
+  clientKey: process.env.CLIENT_KEY ? fs.readFileSync(process.env.CLIENT_KEY) : "",
+  clientCert: process.env.CLIENT_CERT ? fs.readFileSync(process.env.CLIENT_CERT) : "",
+  caCert: process.env.CA_CERT ? fs.readFileSync(process.env.CA_CERT) : "",
+  passphrase: process.env.PASSPHRASE || "",
   prefetchSize: 2048,
   uploadBatchSize: 65536,
   remoteFutureTimeout: 300000,
@@ -33,7 +34,7 @@ let graphJson = `{
                  }`;
 
 let graphEdgeLabelJson = `{
-                            "uri": "classpath:/graph-data/edge_labels.edge",
+                            "uri": "examples/graphs/connections.edge_list.json",
                             "format": "edge_list",
                             "vertex_props": [{
                               "name": "vertexProp",
@@ -52,9 +53,10 @@ let graphEdgeLabelJson = `{
 
 module.exports = {
   pgx: pgx,
-  pgxDir: process.env.ORACLE_PGX_DIR,
+  pgxDir: oracle_pgx_dir,
   baseUrl: baseUrl,
   options: options,
   graphJson: graphJson,
   graphEdgeLabelJson, graphEdgeLabelJson
 };
+

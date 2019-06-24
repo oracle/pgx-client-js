@@ -1,6 +1,7 @@
 'use strict'
 
-const argumentBuilder = require(process.env.ORACLE_PGX_DIR + '/classes/argumentBuilder.js');
+const common = require('./common.js');
+const argumentBuilder = require(common.pgxDir + '/classes/argumentBuilder.js');
 const assert = require('assert');
 
 let analysisJson = {};
