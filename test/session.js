@@ -16,16 +16,19 @@ describe('session', function () {
       assert(session.tokenId);
     });
   });
+
   it('should have sessionId', function() {
     return p.then(function(session) {
       assert(session.sessionId);
     });
   });
+
   it('should have versionId', function() {
     return p.then(function(session) {
       assert(session.versionId);
     });
   });
+
   it('readGraphWithProperties should have a graph', function() {
     return p.then(function(session) {
       return session.readGraphWithProperties(common.graphJson);
@@ -33,6 +36,7 @@ describe('session', function () {
       assert(graph.name && graph.numVertices);
     });
   });
+
   it('getGraph should have a graph', function() {
     let graphName;
     return p.then(function(session) {
@@ -46,13 +50,15 @@ describe('session', function () {
       assert.equal(graph.name, graphName);
     });
   });
+
   it('getGraphs should be equal to number of available graphs', function() {
     return p.then(function(session) {
       return session.getGraphs();
     }).then(function(result) {
-      assert.equal(6, result.length);
+      assert.equal(2, result.length);
     });
   });
+
   it('destroy should remove session', function() {
     return p.then(function(session) {
       return session.destroy();

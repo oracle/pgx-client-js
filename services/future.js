@@ -26,8 +26,9 @@ function privateGetFuture(session, futureId, timeout) {
           reject(commonHelper.createError(null, null, JSON.stringify('remoteFutureTimeout has been reached')));
         },
         session.remoteFutureTimeout);
-      let options = Object.assign(session.baseGetRequest, {url: session.baseUrl + '/core/v1/futures/' +
-        encodeURIComponent(futureId) + '/value'});
+      let options = Object.assign(session.baseGetRequest, {url: session.baseUrl + '/core/v1/futures/x-future-id/value'});
+
+      options.headers['x-future-id'] = encodeURIComponent(futureId)
       request(options, function(err, response, body) {
         let statusCode = response != null ? response.statusCode : null;
         if (!err && ((statusCode === common.HTTP_STATUS_CODES.OK) ||

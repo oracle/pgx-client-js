@@ -41,8 +41,12 @@ module.exports = class Graph {
    * @param {module:classes/graph} graph - graph
    */
   constructor(result, session) {
+    this.id = result.id;
     this.name = result.graphName;
+    this.vertexTables = result.vertexTables;
+    this.edgeTables = result.edgeTables;
     this.transient = result.transient;
+    this.partitioned = result.partitioned;
     this.numVertices = result.metaData.numVertices;
     this.numEdges = result.metaData.numEdges;
     this.vertexIdType = result.metaData.vertexIdType;
@@ -149,15 +153,23 @@ module.exports = class Graph {
     let self = this;
     let filterJson = {
       'type': 'set',
+      'elementType': type,
+      'graphId': self.id,
+      'fromFilter': true,
       'filter': {
         'type': type,
         'filterExpression': 'true',
-        'binaryOperation': false
+        'resultSetFilter': false,
+        'collectionFilter': false,
       },
+      'fromComponent': false,
+      'componentStorageName': null,
+      'componentId': 0,
+      'isScalarCollection': false,
       'collectionName': null
     };
-    return core.postCollectionFromFilter(self, filterJson).then(function(collectionName) {
-      return core.getCollectionProxy(self, collectionName);
+    return core.postCollectionFromFilter(self, filterJson).then(function(collection) {
+      return core.postCollectionProxy(self, collection);
     });
   }
 
@@ -167,9 +179,10 @@ module.exports = class Graph {
       return collectionProxy.getElements(self.session, proxy.proxyId, start, size);
     }).then(function(elements) {
       let collection = [];
-      for(let i=0; i<elements.length; i++) {
+      let elementsItems = elements['items']
+      for(let i=0; i<elementsItems.length; i++) {
         if (type === 'VERTEX') {
-          collection.push(new vertex(elements[i], self));
+          collection.push(new vertex(elementsItems[i], self));
         } else if (type === 'EDGE') {
           collection.push(new edge(elements[i], self));
         }

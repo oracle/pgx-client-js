@@ -27,6 +27,9 @@ module.exports.doDel = function (url, session, item, withFuture) {
   return new Promise(
     function(resolve, reject) {
       let options = Object.assign(session.baseDelRequest, { url: url });
+      if(options.headers){
+        options.headers['SID'] = session.sessionId;
+      }
       request(options, function(err, response, body) {
         let statusCode = response != null ? response.statusCode : null;
         if (!err && ((statusCode === HTTP_STATUS_CODES.OK) || (statusCode === HTTP_STATUS_CODES.CREATED))) {
@@ -57,6 +60,10 @@ module.exports.doPost = function (url, session, jsonContent) {
       }
       localJson['_csrf_token'] = session.basePostRequest.json['_csrf_token'];
       let options = Object.assign(session.basePostRequest, { url: url, json: localJson });
+      if(options.headers){
+        options.headers['SID'] = session.sessionId;
+      }
+
       request(options, function(err, response, body) {
         let statusCode = response != null ? response.statusCode : null;
         if (!err && ((statusCode === HTTP_STATUS_CODES.OK) || (statusCode === HTTP_STATUS_CODES.CREATED)
@@ -73,10 +80,22 @@ module.exports.doPost = function (url, session, jsonContent) {
   });
 }
 
-module.exports.doGet = function (url, session, withFuture) {
+module.exports.doGet = function (url, session, withFuture, headers) {
   return new Promise(
     function(resolve, reject) {
-      let options = Object.assign(session.baseGetRequest, { url: url });
+      let optionParams = { url: url };
+
+      let options = Object.assign(session.baseGetRequest, optionParams);
+      if(options.headers){
+        options.headers['SID'] = session.sessionId;
+      }
+
+      if(headers && options.headers){
+        Object.keys(headers).forEach(k => {
+          options.headers[k] = headers[k];
+        });
+      }
+
       request(options, function(err, response, body) {
         let statusCode = response != null ? response.statusCode : null;
         if (!err && ((statusCode === HTTP_STATUS_CODES.OK) || (statusCode === HTTP_STATUS_CODES.CREATED)

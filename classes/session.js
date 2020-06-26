@@ -82,8 +82,9 @@ module.exports = class Session {
     let self = this;
     return core.getGraphs(self).then(function(result) {
       let collection = [];
-      for(var i=0; i<result.length; i++) {
-        collection.push(new graphClass(result[i], self));
+      let resultItems = result['items']
+      for(var i=0; i< resultItems.length; i++) {
+        collection.push(new graphClass(resultItems[i], self));
       }
       return collection;
     });

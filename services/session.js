@@ -48,6 +48,6 @@ module.exports.postSession = function (url, options, tokenId) {
 }
 
 module.exports.delSession = function (session) {
-  let url = session.baseUrl + '/core/v1/session?_csrf_token=' + session.tokenId;
-  return common.doDel(url, session, session);
+  let url = session.baseUrl + '/core/v1/session' + '?_csrf_token=' + session.tokenId;
+  return common.doDel(url, session, session, false);
 }

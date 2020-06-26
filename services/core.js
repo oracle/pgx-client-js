@@ -91,8 +91,6 @@ module.exports.postPathFromSequences = function (graph, pathJson) {
 }
 
 module.exports.postAllPaths = function (graph, pathJson) {
-  console.log("pathJson");
-  console.log(pathJson);
   pathJson.graphName = graph.name;
   let url = graph.session.baseUrl + '/core/v1/pathProxies/';
   return common.doPost(url, graph.session, pathJson);
@@ -129,7 +127,8 @@ module.exports.postClearCollection = function (graph, collectionName) {
 }
 
 module.exports.postCollectionFromFilter = function (graph, filterJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/collectionFromFilter';
+  let url = graph.session.baseUrl + '/core/v1/collections/';
+
   return common.doPost(url, graph.session, filterJson);
 }
 
@@ -287,9 +286,25 @@ module.exports.getMapProxy = function (graph, mapName) {
   return common.doGet(url, graph.session, true);
 }
 
-module.exports.getCollectionProxy = function (graph, collectionName) {
-  let url = graph.session.baseUrl + '/core/v1/collections/' + encodeURIComponent(collectionName);
-  return common.doGet(url, graph.session, true);
+module.exports.getCollection = function(graph, collection){
+  let url = graph.session.baseUrl + '/core/v1/collections/x-collection-name?graphId=' + encodeURIComponent(graph.id);
+  let headers = { 
+    'x-collection-name': encodeURIComponent(collection.name),
+  }
+  
+  return common.doGet(url, graph.session, true, headers);
+}
+
+module.exports.postCollectionProxy = function (graph, collection) {
+  let url = graph.session.baseUrl + '/core/v1/collectionProxies';
+  let body = {
+    "collectionName": collection.id,
+    "collectionNamespace": null,
+    "id": 0,
+    "isComponentCollection": false
+  }
+
+  return common.doPost(url, graph.session, body);
 }
 
 module.exports.getWrappedCollectionProxy = function (graph, componentNamespace, id) {
@@ -340,8 +355,12 @@ module.exports.getRandomNode = function (graph) {
 }
 
 module.exports.getGraph = function (session, name) {
-  let url = session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(name) + '?ignoreNotFound=true';
-  return common.doGet(url, session, true);
+  let url = session.baseUrl + '/core/v1/getGraphByName';
+  let body = {
+    name: name,
+    namespaceId: null
+  };
+  return common.doPost(url, session, body);
 }
 
 module.exports.getGraphs = function (session) {
