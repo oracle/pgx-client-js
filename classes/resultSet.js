@@ -28,6 +28,7 @@ module.exports = class ResultSet {
    * @param {module:classes/graph} graph - graph
    */
   constructor(result, elements, graph) {
+    this.id = result.id;
     this.resultSetId = result.resultSetId;
     this.numResults = result.numResults;
     this.resultElements = elements.slice();

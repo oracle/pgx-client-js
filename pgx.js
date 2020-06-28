@@ -101,6 +101,35 @@ module.exports.connect = function (url, options) {
       };
     }
     session.basePostRequest = postRequestDefaults;
+
+    let putRequestDefaults = Object.assign({
+      method: 'PUT',
+      json: {
+        '_csrf_token': session.tokenId
+      }
+    }, requestDefaults);
+    if (typeof window === 'undefined') {
+      putRequestDefaults.headers = {
+        'Cookie': 'SID=' + session.sessionId + '; _csrf_token=' + session.tokenId
+      };
+    }
+    session.basePutRequest = putRequestDefaults;
+
+    let patchRequestDefaults = Object.assign({
+      method: 'PATCH',
+      json: {
+        '_csrf_token': session.tokenId
+      }
+    }, requestDefaults);
+    if (typeof window === 'undefined') {
+      patchRequestDefaults.headers = {
+        'Cookie': 'SID=' + session.sessionId + '; _csrf_token=' + session.tokenId
+      };
+    }
+
+    session.basePatchRequest = patchRequestDefaults;
+
+
     return version.getVersion(session);
   }).then(function(versionId) {
     session.versionId = versionId;

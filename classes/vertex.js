@@ -41,8 +41,9 @@ module.exports = class Vertex {
     let self = this;
     let collection = [];
     return core.getEdges(self.graph, self.id, 'INCOMING', self.graph.edgeIdType).then(function(result) {
-      for(var i=0; i<result.length; i++) {
-        collection.push(new edge(result[i], self.graph));
+      let resultItems = result.items
+      for(var i=0; i<resultItems.length; i++) {
+        collection.push(new edge(resultItems[i], self.graph));
       }
       return collection;
     });
@@ -58,8 +59,9 @@ module.exports = class Vertex {
     let self = this;
     let collection = [];
     return core.getNeighbors(self.graph, self.id, 'INCOMING', self.type).then(function(result) {
-      for(var i=0; i<result.length; i++) {
-        collection.push(new Vertex(result[i], self.graph));
+      let resultItems = result.items;
+      for(var i=0; i<resultItems.length; i++) {
+        collection.push(new Vertex(resultItems[i], self.graph));
       }
       return collection;
     });
@@ -75,8 +77,9 @@ module.exports = class Vertex {
     let self = this;
     let collection = [];
     return core.getEdges(self.graph, self.id, 'OUTGOING', self.graph.edgeIdType).then(function(result) {
-      for(var i=0; i<result.length; i++) {
-        collection.push(new edge(result[i], self.graph));
+      let resultItems = result.items;
+      for(var i=0; i<resultItems.length; i++) {
+        collection.push(new edge(resultItems[i], self.graph));
       }
       return collection;
     });
@@ -92,8 +95,9 @@ module.exports = class Vertex {
     let self = this;
     let collection = [];
     return core.getNeighbors(self.graph, self.id, 'OUTGOING', self.type).then(function(result) {
-      for(var i=0; i<result.length; i++) {
-        collection.push(new Vertex(result[i], self.graph));
+      let resultItems = result.items;
+      for(var i=0; i<resultItems.length; i++) {
+        collection.push(new Vertex(resultItems[i], self.graph));
       }
       return collection;
     });
@@ -109,14 +113,13 @@ module.exports = class Vertex {
    */
   getProperty(name) {
     let self = this;
-    let propJson = {
-      'key': {
-        'type': self.type,
-        'value': self.id
-      },
-      'entityType': 'vertex'
-    };
-    return core.postPropertyGet(self.graph, name, propJson).then(function(result) {
+    return self.graph.getVertexProperty(name).then(function(property){
+      if(!property){
+        throw new Error("vertex property: " + name + " is not found.");
+      }
+
+      return core.getPropertyValue(self.graph, property, self.id, self.graph.vertexIdType);
+    }).then(function(result) {
       return result.value;
     });
   }
@@ -132,18 +135,12 @@ module.exports = class Vertex {
    */
   setProperty(name, value) {
     let self = this;
-    let mapValues = {};
-    mapValues[self.id] = value;
     return self.graph.getVertexProperty(name).then(function(property) {
-      let propJson = {
-        'entityType': 'vertex',
-        'keyType': self.type,
-        'valueType': property.type,
-        'defaultValue': null,
-        'values': JSON.stringify(mapValues),
-        'isVector': false
-      };
-      return core.postPropertySet(self.graph, name, propJson).then(function(result) {
+      if(!property){
+        throw new Error("vertex property: " + name + " is not found.");
+      }
+
+      return property.set(self.id, value).then(function(result) {
         return self.getProperty(name);
       });
     });

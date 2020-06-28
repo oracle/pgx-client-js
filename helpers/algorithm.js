@@ -459,17 +459,11 @@ module.exports.degreeDistribution = function (graph, options) {
 }
 
 module.exports.shortestPathDijkstra = function (graph, options) {
-  console.log("options = ");
-  console.log(options);
   let finalOptions = common.getOptions(dijkstraDefault, options);
   let type = finalOptions.variant;
   let rootId = finalOptions.src instanceof vertexClass ? finalOptions.src.id : finalOptions.src;
   let destId = finalOptions.dst instanceof vertexClass ? finalOptions.dst.id : finalOptions.dst;
   let costName = finalOptions.cost instanceof propertyClass ? finalOptions.cost.name : finalOptions.cost;
-  console.log("costName = ");
-  console.log(costName);
-  console.log("finalOptions = ");
-  console.log(finalOptions);
   let parentJson = {
     'entityType': 'vertex',
     'type': 'vertex',
@@ -478,7 +472,7 @@ module.exports.shortestPathDijkstra = function (graph, options) {
     'dimension': 0
   };
   let parentEdgeJson = {
-    'entityType': 'vertex',
+    'entityType': 'edge',
     'type': 'edge',
     'name': finalOptions.parentEdgeName,
     'hardName': finalOptions.parentEdgeName === null ? true : false,
@@ -492,12 +486,13 @@ module.exports.shortestPathDijkstra = function (graph, options) {
   }).then(function(property) {
     parentEdge = property;
     let analysisJson = new argumentBuilderClass('CPU_BOUND', 'boolean')
-      .addGraphArg(graph.name)
-      .addEdgePropertyArg(costName)
+      .addGraphArg(graph.id)
+      .addEdgePropertyArg(property.id)
       .addNodeIdInArg(rootId)
       .addNodeIdInArg(destId)
-      .addNodePropertyArg(parent.name)
-      .addNodePropertyArg(parentEdge.name).build();
+      .addNodePropertyArg(parent.id)
+      .addNodePropertyArg(parentEdge.id).build();
+    console.log(analysisJson);
     if (finalOptions.filterExpr != null) {
       let filterJson = {
         'type': 'PATH_FINDING_FILTER',
@@ -877,8 +872,8 @@ module.exports.pagerank = function (graph, options) {
     obj2Id = obj2.id;
   }
   let propertyJson = {
-    'entityType': 'vertex',
-    'type': 'double',
+    'entityType': 'VERTEX',
+    'type': 'DOUBLE',
     'name': finalOptions.name,
     'hardName': finalOptions.name === null ? true : false,
     'dimension': 0
@@ -887,11 +882,11 @@ module.exports.pagerank = function (graph, options) {
   return getDefaultProperty(graph, propertyJson, finalOptions.rank).then(function(property) {
     localProperty = property;
     let analysisJson = new argumentBuilderClass('CPU_BOUND', 'void')
-      .addGraphArg(graph.name)
+      .addGraphArg(graph.id)
       .addDoubleInArg(finalOptions.e)
       .addDoubleInArg(finalOptions.d)
       .addIntInArg(finalOptions.max)
-      .addNodePropertyArg(localProperty.name).build();
+      .addNodePropertyArg(localProperty.id).build();
     if (type !== pagerankVariant.APPROXIMATE) {
       analysisJson.args.splice(4, 0, new argumentBuilderClass().setType("BOOL_IN").setValue(finalOptions.norm).build());
     }

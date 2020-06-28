@@ -37,7 +37,7 @@ module.exports = class Edge {
     let self = this;
     return core.getVertexFromEdge(self.graph, self.id, 'INCOMING').then(function(result) {
       let vertex = require('../classes/vertex.js'); // to avoid circular reference issue
-      return new vertex(result.value, self.graph);
+      return new vertex(result.id, self.graph);
     });
   }
 
@@ -51,7 +51,7 @@ module.exports = class Edge {
     let self = this;
     return core.getVertexFromEdge(self.graph, self.id, 'OUTGOING').then(function(result) {
       let vertex = require('../classes/vertex.js'); // to avoid circular reference issue
-      return new vertex(result.value, self.graph);
+      return new vertex(result.id, self.graph);
     });
   }
 
@@ -65,14 +65,13 @@ module.exports = class Edge {
    */
   getProperty(name) {
     let self = this;
-    let propJson = {
-      'key': {
-        'type': self.type,
-        'value': self.id
-      },
-      'entityType': 'edge'
-    };
-    return core.postPropertyGet(self.graph, name, propJson).then(function(result) {
+    return self.graph.getEdgeProperty(name).then(function(property){
+      if(!property){
+        throw new Error("edge property: " + name + " is not found.");
+      }
+
+      return core.getPropertyValue(self.graph, property, self.id, self.graph.edgeIdType);
+    }).then(function(result) {
       return result.value;
     });
   }
@@ -88,18 +87,12 @@ module.exports = class Edge {
    */
   setProperty(name, value) {
     let self = this;
-    let mapValues = {};
-    mapValues[self.id] = value;
     return self.graph.getEdgeProperty(name).then(function(property) {
-      let propJson = {
-        'entityType': 'edge',
-        'keyType': self.type,
-        'valueType': property.type,
-        'defaultValue': null,
-        'values': JSON.stringify(mapValues),
-        'isVector': false
-      };
-      return core.postPropertySet(self.graph, name, propJson).then(function(result) {
+      if(!property){
+        throw new Error("edge property: " + name + " is not found.");
+      }
+
+      return property.set(self.id, value).then(function(result) {
         return self.getProperty(name);
       });
     });

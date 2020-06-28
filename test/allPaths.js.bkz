@@ -1,0 +1,47 @@
+'use strict'
+
+const assert = require('assert');
+const common = require('./common.js');
+const pgx = common.pgx;
+
+let p = null;
+let localSession = null;
+
+before(function() {
+  p = pgx.connect(common.baseUrl, common.options).then(function(session) {
+    console.log(localSession);
+    localSession = session;
+    return session.readGraphWithProperties(common.graphJson);
+  }).then(function(graph) {
+    return graph.session.analyst.fattestPath(graph, {root: 128, capacity: 'cost'});
+  });
+});
+
+describe('allPaths', function () {
+  it('source is 128', function() {
+    return p.then(function(allPaths) {
+      assert.equal(128, allPaths.source);
+    });
+  });
+  it('should have proxyId', function() {
+    return p.then(function(allPaths) {
+      assert(allPaths.proxyId);
+    });
+  });
+  it('should have a Path', function() {
+    return p.then(function(allPaths) {
+      return allPaths.getPath(333);
+    }).then(function(path) {
+      assert(path.pathLengthWithCost);
+    });
+  });
+});
+
+after(function() {
+  if(localSession){
+    localSession.destroy().then(function(result) {
+      p = null;
+      localSession = null;
+    });
+  }
+});

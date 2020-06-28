@@ -23,16 +23,23 @@ const HTTP_STATUS_CODES = {
 
 module.exports.HTTP_STATUS_CODES = HTTP_STATUS_CODES;
 
-module.exports.doDel = function (url, session, item, withFuture) {
+module.exports.doDel = function (url, session, item, withFuture, headers) {
   return new Promise(
     function(resolve, reject) {
       let options = Object.assign(session.baseDelRequest, { url: url });
       if(options.headers){
         options.headers['SID'] = session.sessionId;
       }
+
+      if(headers && options.headers){
+        Object.keys(headers).forEach(k => {
+          options.headers[k] = headers[k];
+        });
+      }
+
       request(options, function(err, response, body) {
         let statusCode = response != null ? response.statusCode : null;
-        if (!err && ((statusCode === HTTP_STATUS_CODES.OK) || (statusCode === HTTP_STATUS_CODES.CREATED))) {
+        if (!err && ((statusCode === HTTP_STATUS_CODES.OK) || (statusCode === HTTP_STATUS_CODES.CREATED) || (statusCode === HTTP_STATUS_CODES.ACCEPTED))) {
           if (withFuture) {
             future.getFuture(session, JSON.parse(body).futureId).then(function(result) {
               item = null;
@@ -51,7 +58,7 @@ module.exports.doDel = function (url, session, item, withFuture) {
   });
 }
 
-module.exports.doPost = function (url, session, jsonContent) {
+module.exports.doPost = function (url, session, jsonContent, headers) {
   return new Promise(
     function(resolve, reject) {
       let localJson = {};
@@ -62,6 +69,82 @@ module.exports.doPost = function (url, session, jsonContent) {
       let options = Object.assign(session.basePostRequest, { url: url, json: localJson });
       if(options.headers){
         options.headers['SID'] = session.sessionId;
+      }
+
+      if(headers && options.headers){
+        Object.keys(headers).forEach(k => {
+          options.headers[k] = headers[k];
+        });
+      }
+
+      request(options, function(err, response, body) {
+        let statusCode = response != null ? response.statusCode : null;
+        if (!err && ((statusCode === HTTP_STATUS_CODES.OK) || (statusCode === HTTP_STATUS_CODES.CREATED)
+            || (statusCode === HTTP_STATUS_CODES.ACCEPTED))) {
+          future.getFuture(session, body.futureId).then(function(result) {
+            resolve(result);
+          }, function(err) {
+            reject(err);
+          });
+        } else {
+          reject(commonHelper.createError(err, statusCode, body));
+        }
+      });
+  });
+}
+
+module.exports.doPut = function (url, session, jsonContent, headers) {
+  return new Promise(
+    function(resolve, reject) {
+      let localJson = {};
+      if (jsonContent) {
+        localJson = jsonContent;
+      }
+      localJson['_csrf_token'] = session.basePutRequest.json['_csrf_token'];
+      let options = Object.assign(session.basePutRequest, { url: url, json: localJson });
+      if(options.headers){
+        options.headers['SID'] = session.sessionId;
+      }
+
+      if(headers && options.headers){
+        Object.keys(headers).forEach(k => {
+          options.headers[k] = headers[k];
+        });
+      }
+
+      request(options, function(err, response, body) {
+        let statusCode = response != null ? response.statusCode : null;
+        if (!err && ((statusCode === HTTP_STATUS_CODES.OK) || (statusCode === HTTP_STATUS_CODES.CREATED)
+            || (statusCode === HTTP_STATUS_CODES.ACCEPTED))) {
+          future.getFuture(session, body.futureId).then(function(result) {
+            resolve(result);
+          }, function(err) {
+            reject(err);
+          });
+        } else {
+          reject(commonHelper.createError(err, statusCode, body));
+        }
+      });
+  });
+}
+
+module.exports.doPatch = function (url, session, jsonContent, headers) {
+  return new Promise(
+    function(resolve, reject) {
+      let localJson = {};
+      if (jsonContent) {
+        localJson = jsonContent;
+      }
+      localJson['_csrf_token'] = session.basePatchRequest.json['_csrf_token'];
+      let options = Object.assign(session.basePatchRequest, { url: url, json: localJson });
+      if(options.headers){
+        options.headers['SID'] = session.sessionId;
+      }
+
+      if(headers && options.headers){
+        Object.keys(headers).forEach(k => {
+          options.headers[k] = headers[k];
+        });
       }
 
       request(options, function(err, response, body) {

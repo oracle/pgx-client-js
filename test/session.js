@@ -5,9 +5,13 @@ const common = require('./common.js');
 const pgx = common.pgx;
 
 let p = {};
+let localSession = null;
 
 before(function() {
-  p = pgx.connect(common.baseUrl, common.options);
+  p = pgx.connect(common.baseUrl, common.options).then(function(session){
+    localSession = session;
+    return session;
+  });
 });
 
 describe('session', function () {
@@ -55,7 +59,7 @@ describe('session', function () {
     return p.then(function(session) {
       return session.getGraphs();
     }).then(function(result) {
-      assert.equal(2, result.length);
+      assert(result.length > 0);
     });
   });
 
@@ -66,4 +70,9 @@ describe('session', function () {
       assert.equal(null, result);
     });
   });
+});
+
+after(function() {
+  localSession = null;
+  p = null;
 });

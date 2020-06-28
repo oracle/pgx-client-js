@@ -16,7 +16,7 @@
     "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --timeout 5000"
   },
   "keywords": [
     "pgx",

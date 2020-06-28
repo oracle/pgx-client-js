@@ -17,23 +17,33 @@ const common = require('../services/common.js');
 const graphClass = require('../classes/graph.js');
 
 module.exports.delGraph = function (graph) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '?_csrf_token=' +
-    encodeURIComponent(graph.session.tokenId) + '&ignoreNotFound=false';
-  return common.doDel(url, graph.session, graph, true);
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id?_csrf_token=' +
+    encodeURIComponent(graph.session.tokenId) + '&ignoreNotFound=false&retention=DESTROY_IF_NOT_USED';
+  let headers = {
+    'x-graph-id': graph.id
+  }
+  return common.doDel(url, graph.session, graph, true, headers);
 }
 
 module.exports.delProperty = function (property) {
-  let url = property.graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(property.graph.name) +
-    '/properties/' + encodeURIComponent(property.name) + '?_csrf_token=' +
+  let url = property.graph.session.baseUrl + '/core/v1/graphs/x-graph-id/properties/x-property-name?_csrf_token=' +
     encodeURIComponent(property.graph.session.tokenId) + '&entityType=' +
-    encodeURIComponent(property.entityType.toUpperCase()) + '&ignoreNotFound=false';
-  return common.doDel(url, property.graph.session, property, true);
+    encodeURIComponent(property.entityType.toUpperCase()); 
+
+  let headers = {
+    'x-graph-id': property.graph.id,
+    'x-property-name': property.id
+  }
+  return common.doDel(url, property.graph.session, property, true, headers);
 }
 
 module.exports.delCollection = function (collection) {
-  let url = collection.graph.session.baseUrl + '/core/v1/collections/' + encodeURIComponent(collection.name) +
+  let url = collection.graph.session.baseUrl + '/core/v1/collections/x-collection-name' +
     '?_csrf_token=' + encodeURIComponent(collection.graph.session.tokenId) + '&ignoreNotFound=false';
-  return common.doDel(url, collection.graph.session, collection, true);
+  let headers = {
+    'x-collection-name': collection.name
+  }
+  return common.doDel(url, collection.graph.session, collection, true, headers);
 }
 
 module.exports.delPartition = function (partition) {
@@ -43,25 +53,37 @@ module.exports.delPartition = function (partition) {
 }
 
 module.exports.delMap = function (map) {
-  let url = map.graph.session.baseUrl + '/core/v1/maps/' + encodeURIComponent(map.name) + '?_csrf_token=' +
+  let url = map.graph.session.baseUrl + '/core/v1/maps/x-map-name?_csrf_token=' +
     encodeURIComponent(map.graph.session.tokenId) + '&ignoreNotFound=false';
-  return common.doDel(url, map.graph.session, map, true);
+  let headers = {
+    'x-map-name': map.name
+  }
+  return common.doDel(url, map.graph.session, map, true, headers);
 }
 
 module.exports.delScalar = function (scalar) {
-  let url = scalar.graph.session.baseUrl + '/core/v1/scalars/' + encodeURIComponent(scalar.name) + '?_csrf_token=' +
+  let url = scalar.graph.session.baseUrl + '/core/v1/scalars/x-scalar-name?_csrf_token=' +
     encodeURIComponent(scalar.graph.session.tokenId) + '&ignoreNotFound=false';
-  return common.doDel(url, scalar.graph.session, scalar, true);
+  let headers = {
+    'x-scalar-name': scalar.name
+  }
+  return common.doDel(url, scalar.graph.session, scalar, true, headers);
 }
 
 module.exports.postMap = function (graph, mapJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/map';
+  let url = graph.session.baseUrl + '/core/v1/maps';
+
   return common.doPost(url, graph.session, mapJson);
 }
 
 module.exports.postMapEntry = function (graph, mapName, mapJson) {
-  let url = graph.session.baseUrl + '/core/v1/maps/' + encodeURIComponent(mapName) + '/entry';
-  return common.doPost(url, graph.session, mapJson);
+  let url = graph.session.baseUrl + '/core/v1/maps/x-map-name/entries/x-map-key';
+
+  let headers = {
+    'x-map-name': map.name,
+    'x-map-key': mapJson['key']
+  }
+  return common.doPut(url, graph.session, mapJson, headers);
 }
 
 module.exports.postMapEntryDelete = function (graph, mapName, mapJson) {
@@ -70,19 +92,30 @@ module.exports.postMapEntryDelete = function (graph, mapName, mapJson) {
 }
 
 module.exports.postProperty = function (graph, propertyJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/properties';
-  return common.doPost(url, graph.session, propertyJson);
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/properties';
+  let headers = {
+    'x-graph-id': graph.id
+  }
+
+  return common.doPost(url, graph.session, propertyJson, headers);
 }
 
-module.exports.postPropertyClone = function (graph, propName, propJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/properties/' +
-    encodeURIComponent(propName) + '/clone';
-  return common.doPost(url, graph.session, propJson);
+module.exports.postPropertyClone = function (graph, property, propJson) {
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/properties/x-property-name/clone';
+  let headers = {
+    'x-graph-id': graph.id,
+    'x-property-name': property.id
+  }
+  return common.doPost(url, graph.session, propJson, headers);
 }
 
 module.exports.postPath = function (graph, pathJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/computePath';
-  return common.doPost(url, graph.session, pathJson);
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/computePath';
+  let headers = {
+    'x-graph-id': graph.id
+  };
+  console.log(headers);
+  return common.doPost(url, graph.session, pathJson, headers);
 }
 
 module.exports.postPathFromSequences = function (graph, pathJson) {
@@ -142,14 +175,18 @@ module.exports.postContainsCollection = function (graph, collectionName, collect
   return common.doPost(url, graph.session, collectionJson);
 }
 
+
 module.exports.postCreateSubgraphFromFilter = function (graph, filterJson) {
   let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/createSubgraphFromFilter';
   return common.doPost(url, graph.session, filterJson);
 }
 
 module.exports.postAnalysis = function (graph, analysisJson, analysisName) {
-  let url = graph.session.baseUrl + '/core/v1/analyses/' + encodeURIComponent(analysisName) + '/run';
-  return common.doPost(url, graph.session, analysisJson);
+  let url = graph.session.baseUrl + '/core/v1/analyses/x-aid/run';
+  let headers = {
+    'x-aid': analysisName
+  }
+  return common.doPost(url, graph.session, analysisJson, headers);
 }
 
 module.exports.postExtractTopK = function (graph, mapName, topJson) {
@@ -168,13 +205,19 @@ module.exports.postCreateBipartiteSubgraphFromInDegree = function (graph, graphJ
 }
 
 module.exports.postCreateUndirectedGraph = function (graph, graphJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/createUndirectedGraph';
-  return common.doPost(url, graph.session, graphJson);
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/undirect';
+  let headers = {
+    'x-graph-id': graph.id
+  }
+  return common.doPost(url, graph.session, graphJson, headers);
 }
 
 module.exports.postCreateTransposedGraph = function (graph, graphJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/createTransposedGraph';
-  return common.doPost(url, graph.session, graphJson);
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/transpose';
+  let headers = {
+    'x-graph-id': graph.id
+  };
+  return common.doPost(url, graph.session, graphJson, headers);
 }
 
 module.exports.postSortByDegree = function (graph, graphJson) {
@@ -192,33 +235,51 @@ module.exports.createSparsifiedSubgraph = function (graph, graphJson) {
   return common.doPost(url, graph.session, graphJson);
 }
 
-module.exports.postFill = function (graph, propName, propJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/properties/' +
-    encodeURIComponent(propName) + '/fill';
-  return common.doPost(url, graph.session, propJson);
+module.exports.putFill = function (graph, property, propJson) {
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/properties/x-property-name/fillValue';
+  let headers = {
+    'x-graph-id': graph.id,
+    'x-property-name': property.id
+  };
+  return common.doPut(url, graph.session, propJson, headers);
 }
 
-module.exports.postRename = function (graph, propName, propJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/properties/' +
-    encodeURIComponent(propName) + '/rename';
-  return common.doPost(url, graph.session, propJson);
+module.exports.putRename = function (graph, property, propJson) {
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/properties/x-property-name/name';
+  let headers = {
+    'x-graph-id': graph.id,
+    'x-property-name': property.id
+  }
+  return common.doPut(url, graph.session, propJson, headers);
 }
 
 module.exports.postRenameGraph = function (graph, graphJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/rename';
-  return common.doPost(url, graph.session, graphJson);
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/name';
+  let headers = {
+    'x-graph-id': graph.id
+  }
+  return common.doPut(url, graph.session, graphJson, headers);
 }
 
-module.exports.postPropertyGet = function (graph, propName, propJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/properties/' +
-    encodeURIComponent(propName) + '/get';
-  return common.doPost(url, graph.session, propJson);
+module.exports.getPropertyValue = function (graph, property, key, idType) {
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/properties/x-property-name/values/x-property-key?entityType=' + property.entityType.toUpperCase() + '&idType=' + idType.toUpperCase();
+
+  let headers = {
+    'x-graph-id': graph.id,
+    'x-property-name': property.id,
+    'x-property-key': key
+  };
+
+  return common.doGet(url, graph.session, true, headers);
 }
 
-module.exports.postPropertySet = function (graph, propName, propJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/properties/' +
-    encodeURIComponent(propName) + '/set';
-  return common.doPost(url, graph.session, propJson);
+module.exports.patchPropertySet = function (graph, property, propJson) {
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/properties/x-property-name/values'; 
+  let headers = {
+    'x-graph-id': graph.id,
+    'x-property-name': property.id
+  }
+  return common.doPatch(url, graph.session, propJson, headers);
 }
 
 module.exports.postCombine = function (graph, propJson) {
@@ -227,8 +288,12 @@ module.exports.postCombine = function (graph, propJson) {
 }
 
 module.exports.postGraphClone = function (graph, graphJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/clone';
-  return common.doPost(url, graph.session, graphJson);
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/clone';
+
+  let headers = {
+    'x-graph-id': graph.id
+  }
+  return common.doPost(url, graph.session, graphJson, headers);
 }
 
 module.exports.postStoreGraph = function (graph, graphJson) {
@@ -237,14 +302,23 @@ module.exports.postStoreGraph = function (graph, graphJson) {
 }
 
 module.exports.postPublishGraph = function (graph, graphJson) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/publish';
-  return common.doPost(url, graph.session, graphJson);
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/publish';
+  let headers = {
+    'x-graph-id': graph.id
+  }
+
+  return common.doPost(url, graph.session, graphJson, headers);
 }
 
 module.exports.postPublishProperty = function (property) {
-  let url = property.graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(property.graph.name) + '/properties/' +
-    encodeURIComponent(property.name) + '/publish?entityType=' + encodeURIComponent(property.entityType.toUpperCase());
-  return common.doPost(url, property.graph.session);
+  let url = property.graph.session.baseUrl + '/core/v1/graphs/x-graph-id/properties/x-property-name/publish?entityType=' + encodeURIComponent(property.entityType.toUpperCase());
+
+  let headers = {
+    'x-graph-id': property.graph.id,
+    'x-property-name': property.id
+  }
+
+  return common.doPost(url, property.graph.session, null, headers);
 }
 
 module.exports.readGraphWithProperties = function (session, jsonContent) {
@@ -275,10 +349,26 @@ module.exports.getComponentsProxy = function (graph, propName, num) {
   return common.doGet(url, graph.session, true);
 }
 
-module.exports.getPropertyProxy = function (graph, propName, entityType) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/properties/' +
-    encodeURIComponent(propName) + '/proxy?entityType=' + encodeURIComponent(entityType.toUpperCase());
-  return common.doGet(url, graph.session, true);
+module.exports.postPropertyProxy = function(graph, property, labelFlag = false) {
+  let url = graph.session.baseUrl + '/core/v1/propertyProxies';
+  let body = {
+    'graphId': graph.id,
+    'propertyId': property.id,
+    'entityType': property.entityType,
+    'labelFlag': labelFlag 
+  }
+
+  return common.doPost(url, graph.session, body)
+}
+
+module.exports.getPropertyProxy = function (graph, proxyId) {
+  let url = graph.session.baseUrl + '/core/v1/propertyProxies/x-proxy-id';
+
+  let headers = {
+    'x-proxy-id': proxyId
+  }
+
+  return common.doGet(url, graph.session, true, headers);
 }
 
 module.exports.getMapProxy = function (graph, mapName) {
@@ -319,34 +409,55 @@ module.exports.getScalar = function (graph, scalarName) {
 }
 
 module.exports.exists = function (graph, id, entityType, idType) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/exists?entityType=' +
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/exists?entityType=' +
     encodeURIComponent(entityType.toUpperCase()) + '&idType=' + encodeURIComponent(idType.toUpperCase()) + '&key=' +
     encodeURIComponent(id);
-  return common.doGet(url, graph.session, true);
+  let headers = {
+    'x-graph-id': graph.id
+  }
+
+  return common.doGet(url, graph.session, true, headers);
 }
 
 module.exports.getEdges = function (graph, id, direction, idType) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/vertices/' +
-    encodeURIComponent(id) + '/connectedEdges?direction=' + encodeURIComponent(direction.toUpperCase()) + '&key=' +
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/vertices/x-vertex-id/connectedEdges?direction=' + encodeURIComponent(direction.toUpperCase()) + '&key=' +
     encodeURIComponent(idType.toUpperCase());
-  return common.doGet(url, graph.session, true);
+
+  let headers = {
+    'x-graph-id': graph.id,
+    'x-vertex-id': id
+  }
+  return common.doGet(url, graph.session, true, headers);
 }
 
 module.exports.getVertexFromEdge = function (graph, id, direction) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/vertexFromEdge?edgeId=' +
-    encodeURIComponent(id) + '&direction=' + encodeURIComponent(direction.toUpperCase());
-  return common.doGet(url, graph.session, true);
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/edges/x-edge-id/vertex?direction=' + encodeURIComponent(direction.toUpperCase());
+
+  let headers = {
+    'x-graph-id': graph.id,
+    'x-edge-id': id
+  };
+
+  return common.doGet(url, graph.session, true, headers);
 }
 
 module.exports.getNeighbors = function (graph, id, direction, idType) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/neighbors?vertexId=' +
-    encodeURIComponent(id) + '&direction=' + encodeURIComponent(direction.toUpperCase()) + '&idType=' + encodeURIComponent(idType.toUpperCase());
-  return common.doGet(url, graph.session, true);
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/vertices/x-vertex-id/neighbors?direction=' + encodeURIComponent(direction.toUpperCase()) + '&idType=' + encodeURIComponent(idType.toUpperCase());
+
+  let headers = {
+    'x-graph-id': graph.id,
+    'x-vertex-id': id
+  };
+
+  return common.doGet(url, graph.session, true, headers);
 }
 
 module.exports.isFresh = function (graph) {
-  let url = graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(graph.name) + '/isFresh';
-  return common.doGet(url, graph.session, true);
+  let url = graph.session.baseUrl + '/core/v1/graphs/x-graph-id/isFresh';
+  let headers = {
+    'x-graph-id': graph.id
+  }
+  return common.doGet(url, graph.session, true, headers);
 }
 
 module.exports.getRandomNode = function (graph) {
@@ -374,7 +485,12 @@ module.exports.isPublishedGraph = function (graph) {
 }
 
 module.exports.isPublishedProperty = function (property) {
-  let url = property.graph.session.baseUrl + '/core/v1/graphs/' + encodeURIComponent(property.graph.name) + '/properties/' +
-    encodeURIComponent(property.name) + '/isPublished?entityType=' + encodeURIComponent(property.entityType.toUpperCase());
-  return common.doGet(url, property.graph.session, true);
+  let url = property.graph.session.baseUrl + '/core/v1/graphs/x-graph-id/properties/x-property-name/isPublished?entityType=' + encodeURIComponent(property.entityType.toUpperCase());
+
+  let headers = {
+    'x-graph-id': property.graph.id,
+    'x-property-name': property.id
+  }
+
+  return common.doGet(url, property.graph.session, true, headers);
 }

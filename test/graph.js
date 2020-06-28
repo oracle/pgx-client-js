@@ -16,100 +16,94 @@ before(function() {
     localSession = session;
     return session.readGraphWithProperties(common.graphJson);
   });
-
-  try {
-    fs.unlinkSync(`${common.pgxDir}/graph1.txt`);
-    fs.unlinkSync(`${common.pgxDir}/graph2.txt`);
-    fs.unlinkSync(`${common.pgxDir}/graph3.txt`);
-  } catch (e) {
-    // error is ignored
-  }
 });
 
 describe('graph', function () {
   it('should have a name', function() {
     return p.then(function(graph) {
       assert(graph.name);
-    });
+    }).catch((e) => console.log(e));
   });
+
   it('transient should be false', function() {
     return p.then(function(graph) {
       assert.equal(false, graph.transient);
-    });
+    }).catch((e) => console.log(e));
   });
+
   it('numVertices should be 10916', function() {
     return p.then(function(graph) {
       assert.equal(10916, graph.numVertices);
-    });
+    }).catch((e) => console.log(e));
   });
   it('numEdges should be 10930', function() {
     return p.then(function(graph) {
       assert.equal(10930, graph.numEdges);
-    });
+    }).catch((e) => console.log(e));
   });
   it('should have vertexIdType', function() {
     return p.then(function(graph) {
       assert(graph.vertexIdType);
-    });
+    }).catch((e) => console.log(e));
   });
   it('should have edgeIdType', function() {
     return p.then(function(graph) {
       assert(graph.edgeIdType);
-    });
+    }).catch((e) => console.log(e));
   });
   it('should have memoryMb', function() {
     return p.then(function(graph) {
       assert(graph.memoryMb > 0);
-    });
+    }).catch((e) => console.log(e));
   });
   it('should have dataSourceVersion', function() {
     return p.then(function(graph) {
       assert(graph.dataSourceVersion > '0');
-    });
+    }).catch((e) => console.log(e));
   });
   it('should have creationTimestamp', function() {
     return p.then(function(graph) {
       assert(typeof graph.creationTimestamp === 'number');
-    });
+    }).catch((e) => console.log(e));
   });
   it('should have creationRequestTimestamp', function() {
     return p.then(function(graph) {
       assert(typeof graph.creationRequestTimestamp === 'number');
-    });
+    }).catch((e) => console.log(e));
   });
   it('should have config', function() {
     return p.then(function(graph) {
       assert(graph.config.format);
-    });
+    }).catch((e) => console.log(e));
   });
   it('vertexProperties should return 16 element', function() {
     return p.then(function(graph) {
       return graph.vertexProperties;
     }).then(function(properties) {
       assert.equal(16, properties.length);
-    });
+    }).catch((e) => console.log(e));
   });
-  it('edgeProperties should return 0 element', function() {
+  it('edgeProperties should return 1 element', function() {
     return p.then(function(graph) {
       return graph.edgeProperties;
     }).then(function(properties) {
-      assert.equal(0, properties.length);
-    });
+      assert.equal(1, properties.length);
+    }).catch((e) => console.log(e));
   });
   it('getVertexProperty should return a Property', function() {
     return p.then(function(graph) {
       return graph.getVertexProperty('nickname');
     }).then(function(property) {
       assert((property.name === 'nickname') && (property.entityType === 'vertex'));
-    });
+    }).catch((e) => console.log(e));
   });
 
   it('getEdgeProperty should return a Property', function() {
     return p.then(function(graph) {
       return graph.getEdgeProperty('cost');
     }).then(function(property) {
-      assert(property === undefined);
-    });
+      assert((property.name === 'cost') && (property.entityType === 'edge'));
+    }).catch((e) => console.log(e));
   });
 
   it('getVertices should return 2048 elements', function() {
@@ -117,7 +111,7 @@ describe('graph', function () {
       return graph.getVertices();
     }).then(function(vertices) {
       assert.equal(2048, vertices.length);
-    });
+    }).catch((e) => console.log(e));
   });
 
   it('getVertices in page 1 should return 2 elements', function() {
@@ -125,69 +119,77 @@ describe('graph', function () {
       return graph.getVertices(0, 2);
     }).then(function(vertices) {
       assert.equal(2, vertices.length);
-    });
+    }).catch((e) => console.log(e));
   });
-//  it('getVertices in page 2 should return 2 elements', function() {
-//    return p.then(function(graph) {
-//      return graph.getVertices(2, 2);
-//    }).then(function(vertices) {
-//      assert.equal(2, vertices.length);
-//    });
-//  });
-//  it('getEdges should return 4 elements', function() {
-//    return p.then(function(graph) {
-//      return graph.getEdges();
-//    }).then(function(edges) {
-//      assert.equal(4, edges.length);
-//    });
-//  });
-//  it('getEdges in page 1 should return 2 elements', function() {
-//    return p.then(function(graph) {
-//      return graph.getEdges(0, 2);
-//    }).then(function(edges) {
-//      assert.equal(2, edges.length);
-//    });
-//  });
-//  it('getEdges in page 2 should return 2 elements', function() {
-//    return p.then(function(graph) {
-//      return graph.getEdges(2, 2);
-//    }).then(function(edges) {
-//      assert.equal(2, edges.length);
-//    });
-//  });
-//  it('iterateVertices should return 4 vertices', function() {
-//    return p.then(function(graph) {
-//      return graph.iterateVertices(function(row) {
-//        assert(([128, 333, 99, 1908].indexOf(row.id) > -1) && (row.type === 'integer'));
-//      });
-//    });
-//  });
-//  it('iterateEdges should return 4 edges', function() {
-//    return p.then(function(graph) {
-//      return graph.iterateEdges(function(row) {
-//        assert(([0, 1, 2, 3].indexOf(row.id) > -1) && (row.type === 'long'));
-//      });
-//    });
-//  });
-//  it('fresh should be boolean', function() {
-//    return p.then(function(graph) {
-//      return graph.fresh;
-//    }).then(function(fresh) {
-//      assert(typeof fresh === 'boolean');
-//    });
-//  });
-//  it('undirect() should return a graph', function() {
-//    return p.then(function(graph) {
-//      return graph.undirect();
-//    }).then(function(graph) {
-//      assert(graph.name.includes('sub-graph'));
-//    });
-//  });
+
+  it('getVertices in page 2 should return 2 elements', function() {
+    return p.then(function(graph) {
+      return graph.getVertices(2, 2);
+    }).then(function(vertices) {
+      assert.equal(2, vertices.length);
+    }).catch((e) => console.log(e));
+  });
+
+  it('getEdges should return 2048 elements', function() {
+    return p.then(function(graph) {
+      return graph.getEdges();
+    }).then(function(edges) {
+      assert.equal(2048, edges.length);
+    }).catch((e) => console.log(e));
+  });
+
+  it('getEdges in page 1 should return 2 elements', function() {
+    return p.then(function(graph) {
+      return graph.getEdges(0, 2);
+    }).then(function(edges) {
+      assert.equal(2, edges.length);
+    }).catch((e) => console.log(e));
+  });
+
+  it('getEdges in page 2 should return 2 elements', function() {
+    return p.then(function(graph) {
+      return graph.getEdges(2, 2);
+    }).then(function(edges) {
+      assert.equal(2, edges.length);
+    }).catch((e) => console.log(e));
+  });
+
+  it('iterateVertices should return vertices', function() {
+    return p.then(function(graph) {
+      return graph.iterateVertices(function(row) {
+        assert((row.id > -1) && (row.type === 'long'));
+      });
+    }).catch((e) => console.log(e));
+  });
+
+  it('iterateEdges should return edges', function() {
+    return p.then(function(graph) {
+      return graph.iterateEdges(function(row) {
+        assert((row.id > -1) && (row.type === 'long'));
+      });
+    }).catch((e) => console.log(e));
+  });
+
+  it('fresh should be boolean', function() {
+    return p.then(function(graph) {
+      return graph.fresh;
+    }).then(function(fresh) {
+      assert(typeof fresh === 'boolean');
+    }).catch((e) => console.log(e));
+  });
+
+  it('undirect() should return a graph', function() {
+    return p.then(function(graph) {
+      return graph.undirect();
+    }).then(function(graph) {
+      assert(graph.name.includes('sub-graph'));
+    }).catch((e) => console.log(e));
+  });
+
+/* TODO */
 //  it('undirect(options) should return a graph', function() {
 //    return p.then(function(graph) {
 //    let undirectStrategy = {
-//      'vertexPropNames': ['prop1'],
-//      'edgePropNames': ['cost'],
 //      'inPlace': false,
 //      'newGraphName': 'newUndirectedGraph',
 //      'noTrivialVertices': false,
@@ -198,6 +200,7 @@ describe('graph', function () {
 //      assert(graph.name === 'newUndirectedGraph');
 //    });
 //  });
+
 //  it('sortByDegree() should return a graph', function() {
 //    return p.then(function(graph) {
 //      return graph.sortByDegree();
@@ -308,13 +311,14 @@ describe('graph', function () {
 //      assert.equal(true, result);
 //    });
 //  });
-//  it('queryPgql should return a ResultSet', function() {
-//    return p.then(function(graph) {
-//      return graph.queryPgql('SELECT n WHERE (n)');
-//    }).then(function(resultSet) {
-//      assert(resultSet.resultSetId);
-//    });
-//  });
+
+  it('queryPgql should return a ResultSet', function() {
+    return p.then(function(graph) {
+      return graph.queryPgql('SELECT n WHERE (n)');
+    }).then(function(resultSet) {
+      assert(resultSet.resultSetId);
+    });
+  });
 //  it('createVertexSet should return a VertexSet', function() {
 //    return p.then(function(graph) {
 //      return graph.createVertexSet();
@@ -715,26 +719,29 @@ describe('graph', function () {
 //      assert(graph.name.includes('sub-graph'));
 //    });
 //  });
-//  it('clone(options) should return a graph', function() {
-//    return p.then(function(graph) {
-//      return graph.clone({
-//        'nodePropNames': ['prop1'],
-//        'edgePropNames': ['cost'],
-//        'newGraphName': 'newCloneGraph'
-//      });
-//    }).then(function(graph) {
-//      assert(graph.name === 'newCloneGraph');
-//    });
-//  });
-//  it('rename should have a value', function() {
-//    return p.then(function(graph) {
-//      return graph.clone();
-//    }).then(function(graph) {
-//      return graph.rename("newGraphName");
-//    }).then(function(graph) {
-//      assert(graph.name === 'newGraphName');
-//    });
-//  });
+  it('clone(options) should return a graph', function() {
+    return p.then(function(graph) {
+      return graph.clone({
+        'nodePropNames': ['prop1'],
+        'edgePropNames': ['cost'],
+        'newGraphName': 'newCloneGraph'
+      });
+    }).then(function(graph) {
+      assert(graph.name === 'newCloneGraph');
+      return graph;
+    }).then((g) => g.destroy()).catch((e) => console.log(e));
+  });
+
+  it('rename should have a value', function() {
+    return p.then(function(graph) {
+      return graph.clone();
+    }).then(function(graph) {
+      return graph.rename("newGraphName");
+    }).then(function(graph) {
+      assert(graph.name === 'newGraphName');
+      return graph;
+    }).then((g) => g.destroy()).catch((e) => console.log(e));
+  });
 //  it('publish without properties', function() {
 //    let localGraph;
 //    return p.then(function(graph) {
@@ -811,20 +818,20 @@ describe('graph', function () {
 //      assert.equal(false, result);
 //    });
 //  });
-//  it('destroy should remove graph', function() {
-//    return p.then(function(graph) {
-//      return graph.destroy();
-//    }).then(function(result) {
-//      assert.equal(null, result);
-//    });
-//  });
+  it('destroy should remove graph', function() {
+    return p.then(function(graph) {
+      return graph.destroy();
+    }).then(function(result) {
+      assert.equal(null, result);
+    });
+  });
 });
 
 after(function() {
   if(localSession){
-    localSession.destroy().then(function(result) {
-      p = null;
-      localSession = null;
+    localSession.destroy().catch(function(e){
+      // pass
     });
   }
 });
+

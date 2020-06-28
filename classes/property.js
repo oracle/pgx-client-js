@@ -28,9 +28,11 @@ module.exports = class Property {
    * @param {module:classes/graph} graph - graph
    */
   constructor(result, graph) {
+    this.id = result.id;
     this.type = result.type;
     this.transient = result.transient;
     this.name = result.name;
+    this.namespace = result.namespace;
     this.entityType = result.entityType;
     this.dimension = result.dimension != null ? result.dimension : 0;
     this.graph = graph;
@@ -51,7 +53,7 @@ module.exports = class Property {
         if (self.proxy) {
           resolve(self.proxy);
         } else {
-          return core.getPropertyProxy(self.graph, self.name, self.entityType).then(function(proxy) {
+          return core.postPropertyProxy(self.graph, self).then(function(proxy) {
             self.proxy = proxy;
             resolve(self.proxy);
           });
@@ -191,7 +193,7 @@ module.exports = class Property {
       let cb = function(row) {
         return {key: row.key, value: row.value.vect};
       };
-      return self.dimension > 0 ? result.map(cb) : self.extractDates(result);
+      return self.dimension > 0 ? result.map(cb) : self.extractDates(result.items);
     });
   }
 
@@ -200,7 +202,7 @@ module.exports = class Property {
     return self.getProxy().then(function(proxy) {
       return propertyProxy.getTop(self.graph.session, proxy.proxyId, k, start, size);
     }).then(function(result) {
-      return self.extractDates(result);
+      return self.extractDates(result.items);
     });
   }
 
@@ -209,7 +211,7 @@ module.exports = class Property {
     return self.getProxy().then(function(proxy) {
       return propertyProxy.getBottom(self.graph.session, proxy.proxyId, k, start, size);
     }).then(function(result) {
-      return self.extractDates(result);
+      return self.extractDates(result.items);
     });
   }
 
@@ -259,11 +261,17 @@ module.exports = class Property {
       return numResults;
     }).then(function(numResults) {
       if (type === 'bottom') {
-        f = function(start, size, iterate) {return self.getBottomKValues(k, start, size).then(iterate)};
+        f = function(start, size, iterate) {
+          return self.getBottomKValues(k, start, size).then(iterate)
+        };
       } else if (type === 'top') {
-        f = function(start, size, iterate) {return self.getTopKValues(k, start, size).then(iterate)};
+        f = function(start, size, iterate) {
+          return self.getTopKValues(k, start, size).then(iterate)
+        };
       } else if (type === 'values') {
-        f = function(start, size, iterate) {return self.getValues(start, size).then(iterate)};
+        f = function(start, size, iterate) {
+          return self.getValues(start, size).then(iterate)
+        };
       }
       if (k <= self.graph.session.prefetchSize) {
         size = k;
@@ -302,12 +310,12 @@ module.exports = class Property {
     let propJson = {
       'entityType': self.entityType,
       'value': {
-        'type': self.type,
-        'value': JSON.stringify(localValue),
+        'valueType': self.type,
+        'value': localValue,
         'isVector': self.dimension > 0 ? true : false
       }
     };
-    return core.postFill(this.graph, this.name, propJson).then(function(result) {
+    return core.putFill(self.graph, self, propJson).then(function(result) {
       return self;
     });
   }
@@ -326,7 +334,7 @@ module.exports = class Property {
       'entityType': self.entityType,
       'newName': name
     };
-    return core.postRename(self.graph, self.name, propJson).then(function(result) {
+    return core.putRename(self.graph, self, propJson).then(function(result) {
       self.name = name;
       return self;
     });
@@ -357,24 +365,45 @@ module.exports = class Property {
    */
   setValues(map) {
     let self = this;
-    let mapValues = {};
+    let items = [];
+
     map.forEach(function (value, key) {
       if (self.dimension > 0) {
-        mapValues[key] = {'vect': value, 'type': self.type};
+        // TODO: vector type
       } else {
-        mapValues[key] = self.addJsonDate(value);
+        items.push(
+          {
+            "id": null,
+            "links": null,
+            "value": self.addJsonDate(value),
+            "valueType": self.type,
+            "nodeEdgeValueType": null,
+            "key": key,
+            "keyWrapped": false,
+            "vector": self.dimension > 0 ? true : false,
+            "valueWrapped": false
+          }
+        )
+        self.addJsonDate(value);
       }
     });
-    let keyType = self.entityType === 'vertex' ? self.graph.vertexIdType : self.graph.edgeIdType;
+
     let propJson = {
-      'entityType': self.entityType,
-      'keyType': keyType,
-      'valueType': self.type,
-      'defaultValue': null,
-      'values': JSON.stringify(mapValues),
-      'isVector': self.dimension > 0 ? true : false
-    };
-    return core.postPropertySet(self.graph, self.name, propJson).then(function(result) {
+      "defaultValue": {
+        "id":null,
+        "links":null,
+        "value":null,
+        "valueType":null,
+        "nodeEdgeValueType":null,
+        "key":null,
+        "keyWrapped":false,
+        "vector":false,
+        "valueWrapped":false 
+      },
+      "entityType": self.entityType,
+      "items": items
+    }
+    return core.patchPropertySet(self.graph, self, propJson).then(function(result) {
       return self;
     });
   }
@@ -394,7 +423,7 @@ module.exports = class Property {
       'entityType': self.entityType,
       'newName': localName
     };
-    return core.postPropertyClone(self.graph, self.name, propJson).then(function(newProp) {
+    return core.postPropertyClone(self.graph, self, propJson).then(function(newProp) {
       return new Property(newProp, self.graph);
     })
   }
@@ -421,7 +450,9 @@ module.exports = class Property {
    * @returns {boolean} true if the property is published
    */
   isPublished() {
-    return core.isPublishedProperty(this);
+    return core.isPublishedProperty(this).then(function(result){
+      return result.entity;
+    });
   }
 
   /**
